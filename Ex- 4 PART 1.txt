@@ -1,0 +1,56 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class BeautifulArray {
+
+    public static int[] beautifulArray(int n) {
+        // Start with an array containing numbers from 1 to n
+        List<Integer> nums = new ArrayList<>();
+        for (int i = 1; i <= n; i++) {
+            nums.add(i);
+        }
+
+        // Recursive function to split and combine the array
+        return divide(nums).stream().mapToInt(i -> i).toArray();
+    }
+
+    private static List<Integer> divide(List<Integer> nums) {
+        if (nums.size() <= 1) {
+            return nums;
+        }
+
+        List<Integer> odd = new ArrayList<>();
+        List<Integer> even = new ArrayList<>();
+
+        // Split into odd and even numbers
+        for (int num : nums) {
+            if (num % 2 == 1) {
+                odd.add(num);
+            } else {
+                even.add(num);
+            }
+        }
+
+        // Recursively apply the divide function on odd and even lists and combine them
+        List<Integer> result = new ArrayList<>();
+        result.addAll(divide(odd));
+        result.addAll(divide(even));
+        return result;
+    }
+
+    // Example usage
+    public static void main(String[] args) {
+        int n1 = 4;
+        int[] result1 = beautifulArray(n1);
+        for (int num : result1) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+
+        int n2 = 5;
+        int[] result2 = beautifulArray(n2);
+        for (int num : result2) {
+            System.out.print(num + " ");
+        }
+    }
+}

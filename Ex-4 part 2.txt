@@ -1,0 +1,65 @@
+import java.util.*;
+
+public class Skyline {
+
+    public static List<List<Integer>> getSkyline(int[][] buildings) {
+        // Create a list of events
+        List<int[]> events = new ArrayList<>();
+        
+        for (int[] building : buildings) {
+            // For each building, add start and end events
+            events.add(new int[] {building[0], building[2], 1}); // start event (left edge)
+            events.add(new int[] {building[1], building[2], -1}); // end event (right edge)
+        }
+        
+        // Sort the events by x-coordinate, and in case of a tie, by height
+        // If two events have the same x, process start events before end events
+        Collections.sort(events, (a, b) -> {
+            if (a[0] != b[0]) return a[0] - b[0];  // Sort by x-coordinate
+            return a[2] - b[2];  // If x is same, sort start event (+1) before end event (-1)
+        });
+        
+        // Max-heap to store the heights of buildings
+        PriorityQueue<Integer> maxHeap = new PriorityQueue<>(Collections.reverseOrder());
+        maxHeap.add(0);  // Initialize with ground level height
+        
+        List<List<Integer>> result = new ArrayList<>();
+        int prevMaxHeight = 0;  // Keep track of the previous max height
+        
+        for (int[] event : events) {
+            int x = event[0];  // The x-coordinate
+            int height = event[1];  // The height of the building
+            int type = event[2];  // Type: 1 for start, -1 for end
+            
+            if (type == 1) {
+                // Add the height of the building to the max heap (starting point)
+                maxHeap.add(height);
+            } else {
+                // Remove the height of the building from the max heap (ending point)
+                maxHeap.remove(height);
+            }
+            
+            // Get the current max height
+            int currentMaxHeight = maxHeap.peek();
+            
+            // If the max height changes, we have a key point
+            if (currentMaxHeight != prevMaxHeight) {
+                result.add(Arrays.asList(x, currentMaxHeight));
+                prevMaxHeight = currentMaxHeight;
+            }
+        }
+        
+        return result;
+    }
+
+    // Example usage
+    public static void main(String[] args) {
+        int[][] buildings1 = {{2, 9, 10}, {3, 7, 15}, {5, 12, 12}, {15, 20, 10}, {19, 24, 8}};
+        System.out.println(getSkyline(buildings1)); 
+        // Expected Output: [[2, 10], [3, 15], [7, 12], [12, 0], [15, 10], [20, 8], [24, 0]]
+
+        int[][] buildings2 = {{0, 2, 3}, {2, 5, 3}};
+        System.out.println(getSkyline(buildings2));
+        // Expected Output: [[0, 3], [5, 0]]
+    }
+}
